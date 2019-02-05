@@ -15,6 +15,7 @@ library(tidyverse)
 library(tidyr)
 library(RColorBrewer)
 library(janitor)
+library(chron)
 
 
 
@@ -30,13 +31,16 @@ oil_accidents_raw <- read_csv("database.csv")
 # Initial data cleanup and wrangling
 
 oil_accidents <- oil_accidents_raw %>%
-  clean_names() %>%
-  select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>%
-  separate(accident_date_time, c("date", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%
-  unite("time", hour, minute, sep = ":") %>%
-  unite("time", time, am_or_pm, sep = " ") %>%
-  select(-year) %>%
-  filter(accident_year != 2017)
+  clean_names() %>% #clean the names snake case
+  select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>% #select relevant columns
+  separate(accident_date_time, c("day", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%  #separate the date time column
+  unite("time", hour, minute, sep = ":") %>% #bring time back together
+  unite("time", time, am_or_pm, sep = " ") %>% #bring time back together
+  filter(accident_year != 2017) %>% #filter out the 2 2017 observations
+  unite("date", year,month,day, sep = "-") %>% #make the date column again
+  mutate(date = as.Date(date)) #change date to date standard internation date format 
+  
+#check 
 ```
 
 
