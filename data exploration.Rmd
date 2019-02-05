@@ -1,0 +1,41 @@
+---
+title: "Data Exploration"
+author: "Gage Clawson"
+date: "2/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Load packages
+library(tidyverse)
+library(tidyr)
+library(RColorBrewer)
+library(janitor)
+
+
+
+```
+
+
+```{r}
+#Load the data
+oil_accidents_raw <- read_csv("database.csv")
+```
+
+```{r}
+# Initial data cleanup and wrangling
+
+oil_accidents <- oil_accidents_raw %>%
+  clean_names() %>%
+  select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>%
+  separate(accident_date_time, c("date", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%
+  unite("time", hour, minute, sep = ":") %>%
+  unite("time", time, am_or_pm, sep = " ") %>%
+  select(-year)
+```
+
+
