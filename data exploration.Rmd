@@ -40,7 +40,15 @@ oil_accidents <- oil_accidents_raw %>%
   unite("date", year,month,day, sep = "-") %>% #make the date column again
   mutate(date = as.Date(date)) #change date to date standard internation date format 
   
-#check 
+# do we want to go through the offshore accidents and add states to them by looking at the coordinates? Looks like most of them are in louisana 
+
+# report number 20140310 is in mongolia... should be wyoming
+# report number 20140063 is in china... should be in texas
+# report number 20150309 is near portugal... should be new jersey. 
+# these are obvious incidents of inputting data incorrectly. Lets filter to lat and long ranges for the united states. I think all of the latitudes look fine 
+
+oil_accidents_US <- oil_accidents %>%
+  filter(accident_longitude < -60)
 ```
 
 
@@ -55,5 +63,23 @@ ggplot(sum_df, aes(x = accident_year, y = count_accidents)) +
   geom_line()
 ```
 
+```{r}
+
+library(rworldmap)
+library(mapdata)
+library(maps)
+library(ggmap)
+
+
+usa <- map_data("usa")
+w2hr <- map_data("world2Hires")
+
+gg1 <- ggplot() +
+  geom_polygon(data = usa, aes(x = long, y = lat, group = group), fill = "darkgreen", color = "red") +
+  coord_fixed(1.3)
+
+gg1 + 
+  geom_point(data = oil_accidents_US, aes(x = accident_longitude, y= accident_latitude))
+```
 
 
