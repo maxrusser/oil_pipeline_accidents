@@ -35,7 +35,21 @@ oil_accidents <- oil_accidents_raw %>%
   separate(accident_date_time, c("date", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%
   unite("time", hour, minute, sep = ":") %>%
   unite("time", time, am_or_pm, sep = " ") %>%
-  select(-year)
+  select(-year) %>%
+  filter(accident_year != 2017)
 ```
+
+
+```{r}
+sum_df <- oil_accidents %>%
+  group_by(accident_year) %>%
+  summarise(count_accidents = length(report_number))
+
+## graph in shiny we will be able to select what state
+ggplot(sum_df, aes(x = accident_year, y = count_accidents)) +
+  geom_point() +
+  geom_line()
+```
+
 
 
