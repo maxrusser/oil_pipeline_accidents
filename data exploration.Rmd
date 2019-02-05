@@ -65,6 +65,9 @@ ggplot(sum_df, aes(x = accident_year, y = count_accidents)) +
 
 ```{r}
 
+#http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html 
+#^link to information on how to make maps with r and how i figured this out
+
 library(rworldmap)
 library(mapdata)
 library(maps)
@@ -80,6 +83,7 @@ gg1 <- ggplot() +
 
 gg1 + 
   geom_point(data = oil_accidents_US, aes(x = accident_longitude, y= accident_latitude))
+
 ```
 
 
