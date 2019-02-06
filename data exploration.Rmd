@@ -9,6 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## {.tabset .tabset-fade .tabset-pills}
+
+###Initial data cleaning
 ```{r}
 #Load packages
 library(tidyverse)
@@ -18,6 +21,7 @@ library(janitor)
 library(chron)
 library(sf)
 library(leaflet)
+library(tmap)
 
 
 ```
@@ -53,6 +57,8 @@ oil_accidents_US <- oil_accidents %>%
 ```
 
 
+
+###Exploratory Graphs 
 ```{r}
 sum_df <- oil_accidents %>%
   group_by(accident_year) %>%
@@ -64,6 +70,10 @@ ggplot(sum_df, aes(x = accident_year, y = count_accidents)) +
   geom_line()
 ```
 
+
+###Exploratory Maps 
+
+**Bad map**
 ```{r}
 
 #http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html 
@@ -85,14 +95,18 @@ gg1 <- ggplot() +
   theme_void()
 
 gg1
+```
 
+**Better map**
+```{r}
 library("rnaturalearth")
 library("rnaturalearthdata")
 
 #https://www.r-spatial.org/r/2018/10/25/ggplot2-sf-2.html
 ## make a geometry column out of the lat long columns to possibly use sf like we did in lab to map. 
 oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accident_latitude"), 
-    crs = 4326, agr = "constant")
+    crs = 4326, agr = "constant") %>%
+  select(accident_city, everything())
 
 #make a world map layer
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -103,13 +117,34 @@ ggplot(data = world) +
     coord_sf(xlim = c(-180, -65), ylim = c(19, 75), expand = FALSE) +
   theme_minimal()
 
+```
 
+**Better maps**
+```{r}
 #https://rstudio.github.io/leaflet/shapes.html
 leaflet(oil_accidents_US) %>%
   addTiles()  %>% # Adds bg
   addCircles(lng = ~accident_longitude, lat = ~accident_latitude, weight = 1,
     radius = ~sqrt(all_costs)*30, popup = ~accident_city
   )
+
+
+# these graphs make the same thing, for this one we don't have to provide the lat, long, since it is already provided in the "geometry" column
+leaflet(oil_geom1) %>%
+  addTiles()  %>% # Adds bg
+ addCircles(weight = 1,
+    radius = ~sqrt(all_costs)*30, popup = ~accident_city
+  )
+
+
+```
+
+**BEST MAP**
+```{r}
+# interactive map. The hovering text that shows is whichever the first column in the data frame is. Not sure how to select it so it is not the first column. 
+# Just looking through the map, there are some city names missing (NAs), some wrong city names... should we try to fix this? Not sure how. Maybe getting some lat long and city data and mergining? 
+tmap_mode("view")
+tm_shape(oil_geom1) + tm_bubbles(size = "all_costs", alpha = 0.5)
 ```
 
 
