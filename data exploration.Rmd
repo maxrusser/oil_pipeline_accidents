@@ -104,11 +104,11 @@ ggplot(data = world) +
   theme_minimal()
 
 
-#OMG
+#https://rstudio.github.io/leaflet/shapes.html
 leaflet(oil_accidents_US) %>%
   addTiles()  %>% # Adds bg
   addCircles(lng = ~accident_longitude, lat = ~accident_latitude, weight = 1,
-    radius = ~sqrt(all_costs), popup = ~accident_city
+    radius = ~sqrt(all_costs)*30, popup = ~accident_city
   )
 ```
 
