@@ -16,6 +16,7 @@ library(tidyr)
 library(RColorBrewer)
 library(janitor)
 library(chron)
+library(sf)
 
 
 
@@ -75,15 +76,31 @@ library(ggmap)
 
 
 usa <- map_data("usa")
+
 w2hr <- map_data("world2Hires")
 
 gg1 <- ggplot() +
   geom_polygon(data = usa, aes(x = long, y = lat, group = group), fill = "darkgreen", color = "red") +
-  coord_fixed(1.3)
+  coord_fixed(1.3)  + 
+  geom_point(data = oil_accidents_US, aes(x = accident_longitude, y= accident_latitude)) +
+  theme_void()
 
-gg1 + 
-  geom_point(data = oil_accidents_US, aes(x = accident_longitude, y= accident_latitude))
+gg1
 
+
+
+
+## make a geometry column out of the lat long columns to possibly use sf like we did in lab to map. 
+oil_geom <- st_as_sf(
+  oil_accidents_US, 
+  coords = c('accident_longitude', 'accident_latitude'),
+  crs = "+init=epsg:28992"
+)
+
+oil_geom
+
+ggplot(oil_geom) +
+  geom_sf(aes(fill = all_costs))  ##kind of worked but not really 
 ```
 
 
