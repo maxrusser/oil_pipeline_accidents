@@ -17,7 +17,7 @@ library(RColorBrewer)
 library(janitor)
 library(chron)
 library(sf)
-
+library(leaflet)
 
 
 ```
@@ -77,8 +77,7 @@ library(ggmap)
 
 usa <- map_data("usa")
 
-w2hr <- map_data("world2Hires")
-
+#simple map
 gg1 <- ggplot() +
   geom_polygon(data = usa, aes(x = long, y = lat, group = group), fill = "darkgreen", color = "red") +
   coord_fixed(1.3)  + 
@@ -87,20 +86,30 @@ gg1 <- ggplot() +
 
 gg1
 
+library("rnaturalearth")
+library("rnaturalearthdata")
 
-
-
+#https://www.r-spatial.org/r/2018/10/25/ggplot2-sf-2.html
 ## make a geometry column out of the lat long columns to possibly use sf like we did in lab to map. 
-oil_geom <- st_as_sf(
-  oil_accidents_US, 
-  coords = c('accident_longitude', 'accident_latitude'),
-  crs = "+init=epsg:28992"
-)
+oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accident_latitude"), 
+    crs = 4326, agr = "constant")
 
-oil_geom
+#make a world map layer
+world <- ne_countries(scale = "medium", returnclass = "sf")
 
-ggplot(oil_geom) +
-  geom_sf(aes(fill = all_costs))  ##kind of worked but not really 
+ggplot(data = world) +
+    geom_sf() +
+    geom_sf(data = oil_geom1, size = 1, shape = 23, fill = "darkred") +
+    coord_sf(xlim = c(-180, -65), ylim = c(19, 75), expand = FALSE) +
+  theme_minimal()
+
+
+#OMG
+leaflet(oil_accidents_US) %>%
+  addTiles()  %>% # Adds bg
+  addCircles(lng = ~accident_longitude, lat = ~accident_latitude, weight = 1,
+    radius = ~sqrt(all_costs), popup = ~accident_city
+  )
 ```
 
 
