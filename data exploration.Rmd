@@ -149,4 +149,24 @@ tmap_mode("view")
 tm_shape(oil_geom1) + tm_bubbles(size = "all_costs", alpha = 0.5)
 ```
 
+#GRAPHS
+
+```{r}
+
+# In the app we will change "CA" to the user selected state. 
+
+top_ten_cost_bystate <- oil_accidents %>% 
+  filter(accident_state == "CA") %>% 
+  mutate(operator_name = as.factor(operator_name)) %>% 
+  arrange(-all_costs) %>% 
+  head(10) %>% 
+  ggplot(aes(x = operator_name, y = all_costs)) +
+  geom_col()
+
+top_ten_cost_bystate
+
+```
+
+
+
 
