@@ -22,6 +22,8 @@ library(chron)
 library(sf)
 library(leaflet)
 library(tmap)
+library(kableExtra)
+
 
 
 ```
