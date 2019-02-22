@@ -56,6 +56,8 @@ oil_accidents <- oil_accidents_raw %>%
 
 oil_accidents_US <- oil_accidents %>%
   filter(accident_longitude < -60)
+
+write.csv(oil_accidents_US, "cleaned_oil_data")
 ```
 
 
