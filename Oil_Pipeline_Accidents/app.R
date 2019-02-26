@@ -8,43 +8,61 @@
 #
 
 library(shiny)
+library(tidyverse)
+library(sf)
+library(shinythemes)
+library(tmap)
+library(leaflet)
+
+oil_accidents_US <- read_csv("cleaned_oil_data1.csv")
+oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accident_latitude"), 
+                      crs = 4326, agr = "constant") %>%
+  select(accident_city, everything())
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
-   # Application title
-   titlePanel("US Oil Pipeline Accidents"),
-   
-   # Sidebar with a slider input for number of bins 
-   sidebarLayout(
-      sidebarPanel(
-         sliderInput("bins",
-                     "Number of bins:",
-                     min = 1,
-                     max = 50,
-                     value = 30)
-      ),
+  theme = shinytheme("cerulean"),
+  # Application title
+  titlePanel("United States Oil Accidents (2010-2016)"),
+  
+  # Sidebar with a slider input for number of bins 
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("all_costs",
+                  "Cost of Spill (USD):",
+                  min = 0,
+                  max = 840526118,
+                  value = 0)
       
-      # Show a plot of the generated distribution
-      mainPanel(
-         plotOutput("distPlot")
-      )
-   )
+    ),
+    
+    # Show a plot of the generated distribution
+    mainPanel(
+      leafletOutput("map")
+    )
+  )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
-   output$distPlot <- renderPlot({
-      # generate bins based on input$bins from ui.R
-      x    <- faithful[, 2] 
-      bins <- seq(min(x), max(x), length.out = input$bins + 1)
-      
-      # draw the histogram with the specified number of bins
-      hist(x, breaks = bins, col = 'darkgray', border = 'white')
-   })
+  
+  # Creating the reactive output ('map')
+  output$map <- renderLeaflet({
+    
+    costs_inc <- oil_geom1 %>% 
+      filter(all_costs >= input$all_costs) # Filter based on input selection from height widget
+    
+    # Creating map
+    cost_map <- 
+      tm_shape(costs_inc) +
+      tm_dots(size = "all_costs", alpha = 0.5) 
+    
+    
+    # Leaflet 
+    tmap_leaflet(cost_map)
+    
+  })
 }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
