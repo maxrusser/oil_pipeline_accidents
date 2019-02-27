@@ -14,10 +14,10 @@ library(shinythemes)
 library(tmap)
 library(leaflet)
 
-oil_accidents_US <- read_csv("cleaned_oil_data1.csv")
+oil_accidents_US <- read_csv("cleaned_oil_data.csv")
 oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accident_latitude"), 
                       crs = 4326, agr = "constant") %>%
-  select(accident_city, everything())
+  select(accident_city, everything()) 
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -45,9 +45,15 @@ ui <- fluidPage(
                   "Cost of Spill (USD):",
                   min = 0,
                   max = 840526118,
-                  value = 0)
+                  value = 0),
+      selectInput("pipelinet",
+                  "Select Pipeline Type", 
+                  choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified")
+        ##filter out NA pipeline types? 
+      )
       
     ),
+    
     
     
     # Show a plot of the generated distribution
@@ -66,12 +72,14 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     
     costs_inc <- oil_geom1 %>% 
-      filter(all_costs >= input$all_costs) # Filter based on input selection from height widget
+      filter(all_costs >= input$all_costs, 
+             pipeline_type == input$pipelinet) # Filter based on input selection from height widget
     
     # Creating map
     cost_map <- 
       tm_shape(costs_inc) +
-      tm_dots(size = "all_costs", alpha = 0.5) 
+      tm_dots(size = "all_costs", alpha = 0.5,
+              col = "all_costs") 
     
     
     # Leaflet 
