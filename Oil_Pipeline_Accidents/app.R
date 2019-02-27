@@ -21,12 +21,25 @@ oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accide
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  theme = shinytheme("cerulean"),
+  theme = shinytheme("superhero"),
   # Application title
   titlePanel("United States Oil Accidents (2010-2016)"),
   
+  navbarPage("",
+             
+             tabPanel("Summary",
+                      h1("A header!"),
+                      h2("A secondary header..."),
+                      p("Then some paragraph text. Old Faithful Geyser Data Description: Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA."),
+                      p("Followed by another paragraph of text..."),
+                      h1("Then another header"),
+                      p("You get the idea...)")
+                      
+             ),
+  
   # Sidebar with a slider input for number of bins 
-  sidebarLayout(
+  tabPanel("Map",
+           sidebarLayout(
     sidebarPanel(
       sliderInput("all_costs",
                   "Cost of Spill (USD):",
@@ -36,11 +49,14 @@ ui <- fluidPage(
       
     ),
     
+    
     # Show a plot of the generated distribution
     mainPanel(
       leafletOutput("map")
     )
   )
+)
+)
 )
 
 # Define server logic required to draw a histogram
