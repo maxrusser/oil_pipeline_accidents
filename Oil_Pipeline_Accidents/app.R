@@ -61,6 +61,12 @@ ui <- fluidPage(
       leafletOutput("map")
     )
   )
+), 
+tabPanel("Graph1"
+        
+), 
+tabPanel("Graph2"
+         
 )
 )
 )
