@@ -163,13 +163,14 @@ top_ten_cost_bystate <- oil_accidents %>%
   arrange(all_costs) %>% 
   mutate(report_number = factor(report_number, levels = report_number)) %>%
   ggplot(aes(x = report_number, y = all_costs/100000)) +
-  geom_col(aes(fill = operator_name)) +
+  geom_col(aes(fill = accident_county)) +
   theme_bw() +
   labs(x = "", y = "Total Cost of Accident ($100,000)")+
   coord_flip() +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "right") +
   scale_x_discrete(expand = c(0,0), labels = rev(seq(1:10))) +
-  scale_y_continuous(expand = c(0,0), limits = c(0,1500)) 
+  scale_y_continuous(expand = c(0,0)) +
+  guides(fill=guide_legend(title="Accident County"))
 
 top_ten_cost_bystate
 
