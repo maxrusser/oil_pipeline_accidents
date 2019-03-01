@@ -83,10 +83,22 @@ ui <- fluidPage(
       plotOutput("graph1")
     )
   )
-), 
-tabPanel("Graph2"
-         
-)
+),
+# Graph 2 tab of liquid type by state
+tabPanel("Graph2",
+         sidebarLayout(
+           sidebarPanel(
+             selectInput("acc_state_graph2",
+                         "Select State",
+                         choices = c(sort(oil_accidents_US$accident_state))
+                         )
+           ),
+             mainPanel(
+               plotOutput("graph2")
+             )
+           )
+         )
+
 )
 )
 
@@ -133,7 +145,35 @@ server <- function(input, output) {
       guides(fill=guide_legend(title="Accident County"))
 
     
-  })  
+  })
+  
+  #Graph 2: Liquid type by State
+  
+  output$graph2 <- renderPlot({
+    
+    liquid_types <- oil_accidents_US %>%
+      filter(accident_state == input$acc_state_graph2) %>%
+      group_by(liquid_type, accident_state) %>%
+      summarize(liquid_count = n())
+    
+    liquid_types$fraction = liquid_types$liquid_count / sum(liquid_types$liquid_count)
+    liquid_types = liquid_types[order(liquid_types$fraction), ]
+    liquid_types$ymax = cumsum(liquid_types$fraction)
+    liquid_types$ymin = c(0, head(liquid_types$ymax, n=-1))
+    
+    ggplot(liquid_types, aes(fill=liquid_type, ymax=ymax, ymin=ymin, xmax=4, xmin=3)) +
+      geom_rect() +
+      coord_polar(theta="y") +
+      xlim(c(0, 4)) +
+      theme(panel.grid=element_blank()) +
+      theme(axis.text=element_blank()) +
+      theme(axis.ticks=element_blank()) +
+      annotate("text", x = 0, y = 0, label = NA) +
+      labs(title="") +
+      guides(fill=guide_legend(title="Liquid Type"))
+    
+    
+  })
       
 
 }
