@@ -190,6 +190,14 @@ treemap(treemap_data, index = c("accident_state", "pipeline_type"), vSize = "net
 
 ```
 
+```{r}
+
+liquid_type <- oil_accidents %>%
+  filter(accident_state == "CA") %>%
+  group_by(liquid_type, accident_state) %>%
+  summarize(liquid_count = n())
+
+```
 
 
 
