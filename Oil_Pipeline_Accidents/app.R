@@ -67,8 +67,8 @@ ui <- fluidPage(
            sidebarLayout(
     sidebarPanel(
       selectInput("acc_state_graph1",
-                         "Select State", 
-                         choices = c(sort(oil_accidents_US$accident_state))
+                  "Select State", 
+                  choices = c(sort(oil_accidents_US$accident_state))
              ),
       sliderInput("head_graph1",
                   "Number of Spills Shown",
@@ -80,7 +80,7 @@ ui <- fluidPage(
            
            # Show graph of top cost spills by 
     mainPanel(
-      plotlyOutput("graph1")
+      plotOutput("graph1")
     )
   )
 ), 
@@ -109,18 +109,20 @@ server <- function(input, output) {
     
     # Leaflet 
     tmap_leaflet(cost_map)
+})
   
   #Creating Graph 1: Top Costliest Spills by State and County
-  output$graph1 <- renderPlotly({
+    
+  output$graph1 <- renderPlot({
+    
     top_cost_bystate <- oil_accidents_US %>% 
       filter(accident_state == input$acc_state_graph1) %>% 
       arrange(desc(all_costs)) %>% 
       head(10) %>% 
       arrange(all_costs) %>% 
-      mutate(report_number = factor(report_number, levels = report_number))
+      mutate(report_number = factor(report_number, levels = report_number)) 
     
-    
-    top_cost_graph <- ggplot(top_cost_bystate, aes(x = report_number, y = all_costs/100000)) +
+    ggplot(top_cost_bystate, aes(x = report_number, y = all_costs/100000)) +
       geom_col(aes(fill = accident_county)) +
       theme_bw() +
       labs(x = "", y = "Total Cost of Accident ($100,000)")+
@@ -129,12 +131,11 @@ server <- function(input, output) {
       scale_x_discrete(expand = c(0,0), labels = rev(seq(1:10))) +
       scale_y_continuous(expand = c(0,0)) +
       guides(fill=guide_legend(title="Accident County"))
-    
-    plot_ly(top_cost_graph)
+
     
   })  
       
-  })
+
 }
 
 # Run the application 
