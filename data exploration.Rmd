@@ -23,6 +23,8 @@ library(sf)
 library(leaflet)
 library(tmap)
 library(kableExtra)
+library(packcircles)
+library(ggplot2)
 
 
 
@@ -192,12 +194,41 @@ treemap(treemap_data, index = c("accident_state", "pipeline_type"), vSize = "net
 
 ```{r}
 
-liquid_type <- oil_accidents %>%
+liquid_types <- oil_accidents %>%
   filter(accident_state == "CA") %>%
   group_by(liquid_type, accident_state) %>%
   summarize(liquid_count = n())
 
+liquid_types$fraction = liquid_types$liquid_count / sum(liquid_types$liquid_count)
+liquid_types = liquid_types[order(liquid_types$fraction), ]
+liquid_types$ymax = cumsum(liquid_types$fraction)
+liquid_types$ymin = c(0, head(liquid_types$ymax, n=-1))
+
+liquid_donut = ggplot(liquid_types, aes(fill=liquid_type, ymax=ymax, ymin=ymin, xmax=4, xmin=3)) +
+     geom_rect() +
+     coord_polar(theta="y") +
+     xlim(c(0, 4)) +
+     theme(panel.grid=element_blank()) +
+     theme(axis.text=element_blank()) +
+     theme(axis.ticks=element_blank()) +
+     annotate("text", x = 0, y = 0, label = NA) +
+     labs(title="")
+
+liquid_donut
+
 ```
 
+packing_liquid <- circleProgressiveLayout(liquid_types$liquid_count, sizetype = 'area')
 
+liquid_types = cbind(liquid_types, packing_liquid)
+
+dat.gg <- circleLayoutVertices(packing_liquid, npoints=50)
+
+ggplot() +
+  geom_polygon(data = dat.gg, aes(x, y, group = id, fill=as.factor(id)), colour = "black", alpha = 0.6) +
+  geom_text(data = liquid_type, aes(x, y, size = liquid_count, label = liquid_type)) +
+  scale_size_continuous(range = c(1,4)) +
+  theme_void() + 
+  theme(legend.position="none") +
+  coord_equal()
 
