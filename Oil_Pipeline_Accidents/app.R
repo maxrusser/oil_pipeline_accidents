@@ -69,16 +69,18 @@ ui <- fluidPage(
       selectInput("acc_state_graph1",
                   "Select State", 
                   choices = c(sort(oil_accidents_US$accident_state))
-             ),
+            ),
       sliderInput("head_graph1",
                   "Number of Spills Shown",
                   min = 0,
                   max = 20,
                   value = 10)
-             
-           ),
+            ),
+      radioButtons("graph1_filltype", label = "Select Fill Variable",
+                 choiceNames = list("County of Spill", "Company Responsible"), choiceValues = list("oil_accidents_US$accident_county","oil_accidents_US$operator_name") 
+            )),
            
-           # Show graph of top cost spills by 
+# Show graph of top cost spills by 
     mainPanel(
       plotOutput("graph1")
     )
@@ -88,7 +90,8 @@ tabPanel("Graph2"
          
 )
 )
-)
+
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -117,13 +120,14 @@ server <- function(input, output) {
     
     top_cost_bystate <- oil_accidents_US %>% 
       filter(accident_state == input$acc_state_graph1) %>% 
+      filter(accident_county != "NA") %>% 
       arrange(desc(all_costs)) %>% 
       head(10) %>% 
       arrange(all_costs) %>% 
       mutate(report_number = factor(report_number, levels = report_number)) 
     
     ggplot(top_cost_bystate, aes(x = report_number, y = all_costs/100000)) +
-      geom_col(aes(fill = accident_county)) +
+      geom_col(aes(fill = input$graph1_filltype)) +
       theme_bw() +
       labs(x = "", y = "Total Cost of Accident ($100,000)")+
       coord_flip() +
