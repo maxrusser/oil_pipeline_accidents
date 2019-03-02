@@ -14,8 +14,47 @@ library(shinythemes)
 library(tmap)
 library(leaflet)
 library(plotly)
+library(tidyr)
+library(RColorBrewer)
+library(janitor)
+library(chron)
+library(ggplot2)
 
-oil_accidents_US <- read_csv("cleaned_oil_data.csv")
+#Load the data
+oil_accidents_raw <- read_csv("raw_database.csv")
+
+# Initial data cleanup and wrangling
+
+oil_accidents <- oil_accidents_raw %>%
+  clean_names() %>% #clean the names snake case
+  
+  select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>% #select relevant columns
+  separate(accident_date_time, c("day", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%  #separate the date time column
+  
+  unite("time", hour, minute, sep = ":") %>% #bring time back together
+  
+  unite("time", time, am_or_pm, sep = " ") %>% #bring time back together
+  
+  filter(accident_year != 2017) %>% #filter out the 2 2017 observations
+  
+  unite("date", year,month,day, sep = "-") %>% #make the date column again
+  
+  mutate(date = as.Date(date), 
+         pipeline_type = case_when(
+           is.na(pipeline_type) ~ "Not Specified",
+           pipeline_type == pipeline_type ~ pipeline_type), 
+         accident_city = case_when(
+           pipeline_type == "Not Specified" & is.na(accident_city) ~ "Gulf of Mexico", 
+           pipeline_type == "Not Specified" & !is.na(accident_city) ~ accident_city, 
+           is.na(accident_city) & !is.na(accident_county) ~ accident_county,
+           TRUE ~ accident_city))
+#change date to date standard international date format. Chagne NA pipeline types to "Not Specified". Change those "Not Specified" without city names to "Gulf of Mexico" for city name. If there is a county name but not a city name, assign the city name as county name. 
+
+oil_accidents_US <- oil_accidents %>%
+  filter(accident_longitude < -60)
+
+write.csv(oil_accidents_US, "cleaned_oil_data.csv")
+
 oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accident_latitude"), 
                       crs = 4326, agr = "constant") %>%
   select(accident_city, everything()) 
@@ -44,15 +83,20 @@ ui <- fluidPage(
     sidebarPanel(
       sliderInput("all_costs",
                   "Cost of Spill (USD):",
-                  min = 0,
+                   min = 0,
                   max = 840526118,
                   value = 0),
       selectInput("pipelinet",
                   "Select Pipeline Type", 
-                  choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified")
-        ##filter out NA pipeline types? 
+                  choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") ##filter out NA pipeline types? 
       )
+       #sliderInput("net_loss_barrels", 
+        #            "Number of Barrels Lost",
+         #           min = 0,
+          #         max = 31000,
+           #         value = 0)   
       
+    
     ),
     
     
@@ -62,7 +106,7 @@ ui <- fluidPage(
       leafletOutput("map")
     )
   )
-), 
+  ), 
   tabPanel("Graph1",
            sidebarLayout(
     sidebarPanel(
@@ -85,10 +129,22 @@ ui <- fluidPage(
       plotOutput("graph1")
     )
   )
-), 
-tabPanel("Graph2"
-         
-)
+),
+# Graph 2 tab of liquid type by state
+tabPanel("Graph2",
+         sidebarLayout(
+           sidebarPanel(
+             selectInput("acc_state_graph2",
+                         "Select State",
+                         choices = c(sort(oil_accidents_US$accident_state))
+                         )
+           ),
+             mainPanel(
+               plotOutput("graph2")
+             )
+           )
+         )
+
 )
 
 
@@ -101,7 +157,8 @@ server <- function(input, output) {
     
     costs_inc <- oil_geom1 %>% 
       filter(all_costs >= input$all_costs, 
-             pipeline_type == input$pipelinet) # Filter based on input selection from height widget
+             pipeline_type == input$pipelinet)
+             #net_loss_barrels >= input$net_loss_barrels) 
     
     # Creating map
     cost_map <- 
@@ -137,7 +194,35 @@ server <- function(input, output) {
       guides(fill=guide_legend(title="Accident County"))
 
     
-  })  
+  })
+  
+  #Graph 2: Liquid type by State
+  
+  output$graph2 <- renderPlot({
+    
+    liquid_types <- oil_accidents_US %>%
+      filter(accident_state == input$acc_state_graph2) %>%
+      group_by(liquid_type, accident_state) %>%
+      summarize(liquid_count = n())
+    
+    liquid_types$fraction = liquid_types$liquid_count / sum(liquid_types$liquid_count)
+    liquid_types = liquid_types[order(liquid_types$fraction), ]
+    liquid_types$ymax = cumsum(liquid_types$fraction)
+    liquid_types$ymin = c(0, head(liquid_types$ymax, n=-1))
+    
+    ggplot(liquid_types, aes(fill=liquid_type, ymax=ymax, ymin=ymin, xmax=4, xmin=3)) +
+      geom_rect() +
+      coord_polar(theta="y") +
+      xlim(c(0, 4)) +
+      theme(panel.grid=element_blank()) +
+      theme(axis.text=element_blank()) +
+      theme(axis.ticks=element_blank()) +
+      annotate("text", x = 0, y = 0, label = NA) +
+      labs(title="") +
+      guides(fill=guide_legend(title="Liquid Type"))
+    
+    
+  })
       
 
 }
