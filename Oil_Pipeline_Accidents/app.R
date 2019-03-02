@@ -160,8 +160,9 @@ server <- function(input, output) {
     # Creating map
     cost_map <- 
       tm_shape(costs_inc) +
-      tm_dots(size = "all_costs", alpha = 0.5,
-              col = "all_costs") 
+      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs"), title.col = "Total Cost of Accident (USD)") +
+      tm_view(view.legend.position = c("left", "bottom")) +
+      tm_basemap("Esri.NatGeoWorldMap")
     
     
     # Leaflet 
