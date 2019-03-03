@@ -148,7 +148,10 @@ leaflet(oil_geom1) %>%
 # interactive map. The hovering text that shows is whichever the first column in the data frame is. Not sure how to select it so it is not the first column. 
 # Just looking through the map, there are some city names missing (NAs), some wrong city names... should we try to fix this? Not sure how. Maybe getting some lat long and city data and mergining? 
 tmap_mode("view")
-tm_shape(oil_geom1) + tm_bubbles(size = "all_costs", alpha = 0.5, labels = "all_costs")
+tm_basemap("Esri.NatGeoWorldMap") +
+tm_shape(oil_geom1, projection = 2163) +
+ tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost: " = "all_costs"), title.col = "Total Cost of Accident") +
+  tm_view(view.legend.position = c("left", "bottom")) 
 ```
 
 ###GRAPHS
