@@ -81,11 +81,11 @@ ui <- fluidPage(
   tabPanel("Map",
            sidebarLayout(
     sidebarPanel(
-      sliderInput("all_costs",
-                  "Cost of Spill (USD):",
-                   min = 0,
-                  max = 840526118,
-                  value = 0),
+      #sliderInput("all_costs",
+       #           "Cost of Spill (USD):",
+        #           min = 0,
+         #         max = 840526118,
+          #        value = 0),
       selectInput("pipelinet",
                   "Select Pipeline Type", 
                   choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") ##filter out NA pipeline types? 
@@ -153,17 +153,22 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     
     costs_inc <- oil_geom1 %>% 
-      filter(all_costs >= input$all_costs, 
+      filter(#all_costs >= input$all_costs, 
              pipeline_type == input$pipelinet)
              #net_loss_barrels >= input$net_loss_barrels) 
     
     # Creating map
     cost_map <- 
       tm_shape(costs_inc) +
-      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs"), title.col = "Total Cost of Accident (USD)") +
+      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs", "Location: " = "pipeline_location"), title.col = "Total Cost of Accident (USD)") +
       tm_view(view.legend.position = c("left", "bottom")) +
-      tm_basemap("Esri.NatGeoWorldMap")
+      tm_basemap(c("Esri.OceanBasemap", "CartoDB.DarkMatter"))
     
+    #all basemaps:
+    #http://leaflet-extras.github.io/leaflet-providers/preview/index.html
+   #Esri.OceanBasemap
+    #CartoDB.DarkMatter
+  #Esri.NatGeoWorldMap
     
     # Leaflet 
     tmap_leaflet(cost_map)
