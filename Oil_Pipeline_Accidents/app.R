@@ -63,7 +63,7 @@ oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accide
 ui <- fluidPage(
   theme = shinytheme("superhero"),
   # Application title
-  titlePanel("United States Oil Accidents (2010-2016)"),
+  titlePanel("United States Oil Pipeline Accidents (2010-2016)"),
   
   navbarPage("",
              
@@ -137,7 +137,8 @@ tabPanel("Graph2",
            sidebarPanel(
              selectInput("acc_state_graph2",
                          "Select State",
-                         choices = c(sort(oil_accidents_US$accident_state))
+                         choices = c(sort(oil_accidents_US$accident_state)),
+                         selected = 4
                          )
            ),
              mainPanel(
