@@ -61,11 +61,11 @@ oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accide
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  theme = shinytheme("superhero"),
+  theme = shinytheme("cerulean"),
   # Application title
-  titlePanel("United States Oil Pipeline Accidents (2010-2016)"),
+  titlePanel(img(src='brenlogo.png')),
   
-  navbarPage("",
+  navbarPage("US Oil Pipeline Accidents (2010-2016)",
              
              tabPanel("Summary",
                       h1("A header!"),
@@ -76,79 +76,80 @@ ui <- fluidPage(
                       p("You get the idea...)")
                       
              ),
-  
-  # Sidebar with a slider input for number of bins 
-  tabPanel("Map",
-           sidebarLayout(
-    sidebarPanel(
-      #sliderInput("all_costs",
-       #           "Cost of Spill (USD):",
-        #           min = 0,
-         #         max = 840526118,
-          #        value = 0),
-      selectInput("pipelinet",
-                  "Select Pipeline Type", 
-                  choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") ##filter out NA pipeline types? 
-      )
-       #sliderInput("net_loss_barrels", 
-        #            "Number of Barrels Lost",
-         #           min = 0,
-          #         max = 31000,
-           #         value = 0)   
-      
-    
-    ),
-    
-    
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      leafletOutput("map")
-    )
-  )
-  ), 
-  tabPanel("Graph1",
-           sidebarLayout(
-    sidebarPanel(
-      selectInput("acc_state_graph1",
-                  "Select State", 
-                  choices = c(sort(oil_accidents_US$accident_state)),
-                  selected = 4
-            ),
-      sliderInput("head_graph1",
-                  "Number of Spills Shown",
-                  min = 0,
-                  max = 20,
-                  value = 10)
-            ),
-      radioButtons("graph1_filltype", label = "Select Fill Variable",
-                 choices = list("County of Spill", "Company Responsible")
-            )),
-           
-# Show graph of top cost spills by 
-    mainPanel(
-      plotOutput("graph1")
-    )
-  
-),
-# Graph 2 tab of liquid type by state
-tabPanel("Graph2",
-         sidebarLayout(
-           sidebarPanel(
-             selectInput("acc_state_graph2",
-                         "Select State",
-                         choices = c(sort(oil_accidents_US$accident_state)),
-                         selected = 4
-                         )
-           ),
-             mainPanel(
-               plotOutput("graph2")
+             
+             # Sidebar with a slider input for number of bins 
+             tabPanel("Map",
+                      sidebarLayout(
+                        sidebarPanel(
+                          #sliderInput("all_costs",
+                          #           "Cost of Spill (USD):",
+                          #           min = 0,
+                          #         max = 840526118,
+                          #        value = 0),
+                          selectInput("pipelinet",
+                                      "Select Pipeline Type", 
+                                      choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") ##filter out NA pipeline types? 
+                          )
+                          #sliderInput("net_loss_barrels", 
+                          #            "Number of Barrels Lost",
+                          #           min = 0,
+                          #         max = 31000,
+                          #         value = 0)   
+                          
+                          
+                        ),
+                        
+                        
+                        
+                        # Show a plot of the generated distribution
+                        mainPanel(
+                          leafletOutput("map")
+                        )
+                      )
+             ), 
+             tabPanel("Graph1",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("acc_state_graph1",
+                                      "Select State", 
+                                      choices = c(sort(oil_accidents_US$accident_state)),
+                                      selected = 4
+                          ),
+                          sliderInput("head_graph1",
+                                      "Number of Spills Shown",
+                                      min = 0,
+                                      max = 20,
+                                      value = 10)
+                        ),
+                        radioButtons("graph1_filltype", label = "Select Fill Variable",
+                                     choices = list("County of Spill", "Company Responsible")
+                        )),
+                      
+                      # Show graph of top cost spills by 
+                      mainPanel(
+                        plotOutput("graph1")
+                      )
+                      
+             ),
+             # Graph 2 tab of liquid type by state
+             tabPanel("Graph2",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("acc_state_graph2",
+                                      "Select State",
+                                      choices = c(sort(oil_accidents_US$accident_state)),
+                                      selected = 4
+                          )
+                        ),
+                        mainPanel(
+                          plotOutput("graph2")
+                        )
+                      )
              )
-           )
-         )
+             
+  )
+)
 
-)
-)
 
 
 # Define server logic required to draw a histogram
