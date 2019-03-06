@@ -139,7 +139,7 @@ ui <- fluidPage(
                                       "Select State",
                                       choices = c(sort(oil_accidents_US$accident_state)),
                                       selected = 4
-                          )
+                          ), width = 2
                         ),
                         mainPanel(
                           plotOutput("graph2")
@@ -244,7 +244,7 @@ server <- function(input, output) {
       labs(title="") +
       guides(fill=guide_legend(title="Liquid Type")) +
       theme_void()+ 
-      theme(legend.position = "bottom", legend.direction = "vertical")
+    theme(legend.position = "bottom", legend.direction = "vertical")
     
     
     ####comment out above and run lines below for interactive plotly output. For plotly output also need to add "renderPlotly" and "plotlyOutput" up above for graph2. ####
@@ -253,8 +253,9 @@ server <- function(input, output) {
      # add_pie(hole = 0.75) %>% 
       #layout(showlegend = T,
        #     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-        #    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         #   legend = list(orientation = "h", x = 0.4, y = -0.2))
+        
+    #    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+     #       legend = list(orientation = "h", x = 0.4, y = -0.2))
     
     
     
