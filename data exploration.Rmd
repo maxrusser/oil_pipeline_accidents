@@ -76,6 +76,18 @@ write.csv(oil_accidents_US, "cleaned_oil_data")
 ```
 
 
+```{r}
+ liquid_types <- oil_accidents_US %>%
+      group_by(liquid_type, accident_state) %>%
+      summarize(liquid_count = n())
+    
+    liquid_types$fraction = liquid_types$liquid_count / sum(liquid_types$liquid_count)
+    liquid_types = liquid_types[order(liquid_types$fraction), ]
+    liquid_types$ymax = cumsum(liquid_types$fraction)
+    liquid_types$ymin = c(0, head(liquid_types$ymax, n=-1))
+```
+
+
 ###Exploratory Maps 
 
 ```{r, include = FALSE}

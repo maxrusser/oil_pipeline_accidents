@@ -61,7 +61,7 @@ oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accide
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  theme = shinytheme("cerulean"),
+  theme = shinytheme("spacelab"),
   # Application title
   titlePanel(img(src='brenlogo.png')),
   
@@ -234,7 +234,7 @@ server <- function(input, output) {
     liquid_types$ymin = c(0, head(liquid_types$ymax, n=-1))
     
     ggplot(liquid_types, aes(fill=liquid_type, ymax=ymax, ymin=ymin, xmax=4, xmin=3)) +
-      geom_rect() +
+      geom_rect(colour = "grey30") +
       coord_polar(theta="y") +
       xlim(c(0, 4)) +
       theme(panel.grid=element_blank()) +
@@ -242,13 +242,27 @@ server <- function(input, output) {
       theme(axis.ticks=element_blank()) +
       annotate("text", x = 0, y = 0, label = NA) +
       labs(title="") +
-      guides(fill=guide_legend(title="Liquid Type"))
+      guides(fill=guide_legend(title="Liquid Type")) +
+      theme_void()+ 
+      theme(legend.position = "bottom", legend.direction = "vertical")
+    
+    
+    ####comment out above and run lines below for interactive plotly output. For plotly output also need to add "renderPlotly" and "plotlyOutput" up above for graph2. ####
+    
+    #plot_ly(liquid_types, labels = ~liquid_type, values = ~fraction, fill = ~liquid_type) %>%
+     # add_pie(hole = 0.75) %>% 
+      #layout(showlegend = T,
+       #     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+        #    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         #   legend = list(orientation = "h", x = 0.4, y = -0.2))
+    
+    
     
     
   })
-      
 
 }
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
