@@ -132,7 +132,7 @@ ui <- fluidPage(
                       
              ),
              # Graph 2 tab of liquid type by state
-             tabPanel("Graph2",
+             tabPanel("Liquid Type By State",
                       sidebarLayout(
                         sidebarPanel(
                           selectInput("acc_state_graph2",
@@ -256,8 +256,6 @@ server <- function(input, output) {
         
     #    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
      #       legend = list(orientation = "h", x = 0.4, y = -0.2))
-    
-    
     
     
   })
