@@ -29,7 +29,7 @@ oil_accidents <- oil_accidents_raw %>%
   clean_names() %>% #clean the names snake case
   
   select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>% #select relevant columns
-  separate(accident_date_time, c("day", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%  #separate the date time column
+  separate(accident_date_time, c("month", "day", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%  #separate the date time column
   
   unite("time", hour, minute, sep = ":") %>% #bring time back together
   
@@ -39,7 +39,7 @@ oil_accidents <- oil_accidents_raw %>%
   
   unite("date", year,month,day, sep = "-") %>% #make the date column again
   
-  mutate(date = as.Date(date), 
+  mutate( 
          pipeline_type = case_when(
            is.na(pipeline_type) ~ "Not Specified",
            pipeline_type == pipeline_type ~ pipeline_type), 
@@ -63,14 +63,15 @@ oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accide
 ui <- fluidPage(
   theme = shinytheme("spacelab"),
   # Application title
-  titlePanel(img(src='brenlogo.png')),
+  titlePanel(title = img(src='brenlogo.png', height = 100)),
   
   navbarPage("US Oil Pipeline Accidents (2010-2016)",
              
              tabPanel("Summary",
-                      h1("A header!"),
-                      h2("A secondary header..."),
-                      p("Then some paragraph text. Old Faithful Geyser Data Description: Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA."),
+                      p(strong("Gage Clawson, Nelson Gould, Max Russer")),
+                      h1("A header"),
+                    
+                      p(div(img(src='Offshore-CA-Feature.jpg'), br(em("Source:"))), br("Then some paragraph text. Old Faithful Geyser Data Description: Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.") ), 
                       p("Followed by another paragraph of text..."),
                       h1("Then another header"),
                       p("You get the idea...)")
@@ -78,7 +79,7 @@ ui <- fluidPage(
              ),
              
              # Sidebar with a slider input for number of bins 
-             tabPanel("Map",
+             tabPanel("Accident Map",
                       sidebarLayout(
                         sidebarPanel(
                           #sliderInput("all_costs",
@@ -89,7 +90,7 @@ ui <- fluidPage(
                           selectInput("pipelinet",
                                       "Select Pipeline Type", 
                                       choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") ##filter out NA pipeline types? 
-                          )
+                          ), width =3
                           #sliderInput("net_loss_barrels", 
                           #            "Number of Barrels Lost",
                           #           min = 0,
@@ -166,7 +167,7 @@ server <- function(input, output) {
     # Creating map
     cost_map <- 
       tm_shape(costs_inc) +
-      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs", "Location: " = "pipeline_location"), title.col = "Total Cost of Accident (USD)") +
+      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs", "Location: " = "pipeline_location", "Date:" = "date"), title.col = "Total Cost of Accident (USD)") +
       tm_view(view.legend.position = c("left", "bottom")) +
       tm_basemap(c("Esri.OceanBasemap", "CartoDB.DarkMatter"))
     

@@ -24,7 +24,7 @@ library(leaflet)
 library(tmap)
 library(kableExtra)
 library(ggplot2)
-
+library(lubridate)
 
 
 ```
@@ -41,18 +41,18 @@ oil_accidents_raw <- read_csv("raw_database.csv")
 oil_accidents <- oil_accidents_raw %>%
   clean_names() %>% #clean the names snake case
   
-  select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>% #select relevant columns
-  separate(accident_date_time, c("day", "month", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%  #separate the date time column
+  select(report_number, accident_year:liquid_type, accident_city:cause_category, net_loss_barrels:restart_date_time, property_damage_costs:all_costs) %>%  #select relevant columns
+  separate(accident_date_time, c("month", "day", "year", "hour", "minute" ,"am_or_pm"), by = c("/", " ")) %>%  #separate the date time column
   
-  unite("time", hour, minute, sep = ":") %>% #bring time back together
+  unite("time", hour, minute, sep = ":") %>%  #bring time back together
   
-  unite("time", time, am_or_pm, sep = " ") %>% #bring time back together
+  unite("time", time, am_or_pm, sep = " ") %>%  #bring time back together
   
   filter(accident_year != 2017) %>% #filter out the 2 2017 observations
   
   unite("date", year,month,day, sep = "-") %>% #make the date column again
   
-  mutate(date = as.Date(date), 
+  mutate(
          pipeline_type = case_when(
     is.na(pipeline_type) ~ "Not Specified",
     pipeline_type == pipeline_type ~ pipeline_type), 
