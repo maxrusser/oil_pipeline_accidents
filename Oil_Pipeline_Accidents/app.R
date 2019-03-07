@@ -71,7 +71,7 @@ ui <- fluidPage(
                       p(strong("Gage Clawson, Nelson Gould, Max Russer")),
                       h1("A header"),
                     
-                      p(div(img(src='Offshore-CA-Feature.jpg'), br(em("Source:"))), br("Then some paragraph text. Old Faithful Geyser Data Description: Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.") ), 
+                      p(div(img(src='PlatformHolly.jpg'), br(em("Source:"))), br("Then some paragraph text. Old Faithful Geyser Data Description: Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.") ), 
                       p("Followed by another paragraph of text..."),
                       h1("Then another header"),
                       p("You get the idea...)")
