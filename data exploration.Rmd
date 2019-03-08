@@ -234,17 +234,5 @@ liquid_donut
 
 ```
 
-packing_liquid <- circleProgressiveLayout(liquid_types$liquid_count, sizetype = 'area')
 
-liquid_types = cbind(liquid_types, packing_liquid)
-
-dat.gg <- circleLayoutVertices(packing_liquid, npoints=50)
-
-ggplot() +
-  geom_polygon(data = dat.gg, aes(x, y, group = id, fill=as.factor(id)), colour = "black", alpha = 0.6) +
-  geom_text(data = liquid_type, aes(x, y, size = liquid_count, label = liquid_type)) +
-  scale_size_continuous(range = c(1,4)) +
-  theme_void() + 
-  theme(legend.position="none") +
-  coord_equal()
 

@@ -65,14 +65,17 @@ ui <- fluidPage(
   # Application title
   titlePanel(title = img(src='brenlogo.png', height = 100)),
   
-  navbarPage("US Oil Pipeline Accidents (2010-2016)",
+  navbarPage("messy spills",
              
              tabPanel("Summary",
                       p(strong("Gage Clawson, Nelson Gould, Max Russer")),
                       h1("A header"),
                     
-                      p(div(img(src='PlatformHolly.jpg'), br(em("Source:"))), br("Then some paragraph text. Old Faithful Geyser Data Description: Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.") ), 
-                      p("Followed by another paragraph of text..."),
+                      p(div(img(src='PlatformHolly.jpg'), br(em("Source:"))), br("Despite advances in renewable energy, the United States transportation sector is predominantly run on crude oil and the petroleum products the oil is used to make (i.e gasoline). Because oil is not refined and consumed in the same location that it is extracted, transportation of vast amounts of oil around the country is necessary. In the U.S, the primary mode of oil transportation is via pipelines (Forbes). Oil pipeline spills are disturbingly common in the U. S. The extent of their impact can be difficult to fully fathom. This app is designed to help users explore the geographic spread, cost, and liquid types involved in U.S oil pipeline accidents. 
+
+                                                                                 ") ), 
+                      p("A dataset created by the U.S Department of Transportation consisting of oil pipeline accidents in the U.S from January 2010 to January 2017 was used.
+Data Source: https://www.kaggle.com/usdot"),
                       h1("Then another header"),
                       p("You get the idea...)")
                       
