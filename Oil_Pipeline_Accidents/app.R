@@ -59,6 +59,15 @@ oil_geom1 <- st_as_sf(oil_accidents_US, coords = c("accident_longitude", "accide
                       crs = 4326, agr = "constant") %>%
   select(accident_city, everything()) 
 
+graph1_oil_accidents_US <- oil_accidents_US %>% 
+  rename(County = accident_county) %>% 
+  rename(Operator = operator_name)
+
+county_or_company <- graph1_oil_accidents_US %>% 
+  select(County, Operator) %>% 
+  names()
+
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   theme = shinytheme("spacelab"),
@@ -111,29 +120,26 @@ Data Source: https://www.kaggle.com/usdot"),
                         )
                       )
              ), 
-             tabPanel("Graph1",
+             tabPanel("Top Spills",
                       sidebarLayout(
                         sidebarPanel(
                           selectInput("acc_state_graph1",
                                       "Select State", 
                                       choices = c(sort(oil_accidents_US$accident_state)),
-                                      selected = 4
+                                      selected = 1
                           ),
-                          sliderInput("head_graph1",
-                                      "Number of Spills Shown",
-                                      min = 0,
-                                      max = 20,
-                                      value = 10)
+          
+                        radioButtons("graph1_filltype", label = "Divide by County or Company Responsible",
+                                     choices = county_or_company
+                        )
                         ),
-                        radioButtons("graph1_filltype", label = "Select Fill Variable",
-                                     choices = list("County of Spill", "Company Responsible")
-                        )),
                       
                       # Show graph of top cost spills by 
                       mainPanel(
                         plotOutput("graph1")
                       )
                       
+             )
              ),
              # Graph 2 tab of liquid type by state
              tabPanel("Liquid Type By State",
@@ -186,40 +192,40 @@ server <- function(input, output) {
   
   #Creating Graph 1: Top Costliest Spills by State and County
     
+  
+  
+  
   output$graph1 <- renderPlot({
+
     
-    top_cost_bystate <- oil_accidents_US %>% 
+    top_cost_bystate <- graph1_oil_accidents_US %>% 
       filter(accident_state == input$acc_state_graph1) %>% 
-      filter(accident_county != "NA") %>% 
+      filter(County != "NA") %>% 
+      filter(County != "N/A") %>% 
+      filter(Operator != "NA") %>% 
       arrange(desc(all_costs)) %>% 
       head(10) %>% 
       arrange(all_costs) %>% 
-      mutate(report_number = factor(report_number, levels = report_number)) 
+      mutate(report_number = factor(report_number, levels = report_number))
     
-    graph1_fill <- ifelse(input$graph1_filltype == "County of Spill", oil_accidents_US$accident_county, oil_accidents_US$operator_name)
+    state_length <- length(top_cost_bystate$report_number)
     
-    ifelse(input$graph1_filltype == "County of Spill",
-                  (ggplot(top_cost_bystate, aes(x = report_number, y = all_costs/100000)) +
-                    geom_col(aes(fill = accident_county)) +
-                    theme_bw() +
-                    labs(x = "", y = "Total Cost of Accident ($100,000)")+
-                    coord_flip() +
-                    theme(legend.position = "right") +
-                    scale_x_discrete(expand = c(0,0), labels = rev(seq(1:10))) +
-                    scale_y_continuous(expand = c(0,0)) +
-                    guides(fill=guide_legend(title= "County of Spill"))),
-                  
-                  (ggplot(top_cost_bystate, aes(x = report_number, y = all_costs/100000)) +
-                     geom_col(aes(fill = operator_name)) +
-                     theme_bw() +
-                     labs(x = "", y = "Total Cost of Accident ($100,000)")+
-                     coord_flip() +
-                     theme(legend.position = "right") +
-                     scale_x_discrete(expand = c(0,0), labels = rev(seq(1:10))) +
-                     scale_y_continuous(expand = c(0,0)) +
-                     guides(fill=guide_legend(title= "Company Responsible")))
-    )
-
+    top_cost_bystate <- top_cost_bystate %>% 
+      mutate(rank = seq(from = state_length, to = 1, by = -1)) %>% 
+      mutate(rank = factor(rank, levels = rank))
+    
+    
+    ggplot(top_cost_bystate, aes(x = rank, y = all_costs/100000)) +
+      geom_col(aes_string(fill = input$graph1_filltype)) +
+      scale_fill_brewer(palette = "Set3") +
+      theme_classic() +
+      labs(x = "", y = "Total Cost of Accident ($100,000)")+
+      coord_flip() +
+      theme(legend.position = "right") +
+      scale_x_discrete(expand = c(0,0)) +
+      scale_y_continuous(expand = c(0,0)) +
+      guides(fill=guide_legend(title= input$graph1_filltype))
+    
     
   })
   
