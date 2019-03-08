@@ -129,7 +129,7 @@ Data Source: https://www.kaggle.com/usdot"),
                                       selected = 1
                           ),
           
-                        radioButtons("graph1_filltype", label = "Divide by County or Company Responsible",
+                        radioButtons("graph1_filltype", label = "Divide by County or Operator Responsible",
                                      choices = county_or_company
                         )
                         ),
