@@ -92,11 +92,11 @@ ui <- fluidPage(
                                                                                  ") ), 
                       p("A dataset created by the U.S Department of Transportation consisting of oil pipeline accidents in the U.S from January 2010 to January 2017 was used.
 Data Source: https://www.kaggle.com/usdot"),
-                      h1("Map of Accidents and Costs"),
-                      p("You get the idea...)"), 
-                      h1("Top Spills by State"),
+                      h3("Map of Accidents and Costs"),
+                      p("The second tab of our app, 'Map of Accidents and Costs', shows the location of different oil accidents across the United States. It also shows the cost of each accident, represented by the size of the dot. The drop down menu allows the user to select the type of pipeline the accident occurred on. Upon clicking on an individual dot, information on the City, Total Cost, Location (Onshore or Offshore), and Date of accident appears. Within the map, the user has the choice of selecting the basemap to view, one with a light theme, and one with a dark theme."), 
+                      h3("Top Spills by State"),
                       p("asdfasdfas"),
-                      h1("Liquid Type by State"),
+                      h3("Liquid Type by State"),
                       p("Asdfasdfasd")
                       
              ),
@@ -106,7 +106,7 @@ Data Source: https://www.kaggle.com/usdot"),
                         sidebarPanel(
                           selectInput("pipelinet",
                                       "Select Pipeline Type", 
-                                      choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") 
+                                      choices = c("Underground"= "UNDERGROUND", "Aboveground" ="ABOVEGROUND",  "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") 
                           ), width =3
                         ),
                         
