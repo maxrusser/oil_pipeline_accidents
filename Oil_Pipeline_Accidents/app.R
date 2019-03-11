@@ -82,12 +82,12 @@ ui <- fluidPage(
   # Application title
   titlePanel(title = img(src='brenlogo.png', height = 100)),
   
-  navbarPage("messy spills",
+  navbarPage("US Oil Accidents (2010-2016)",
              
              tabPanel("Summary",
                       p(strong("Gage Clawson, Nelson Gould, Max Russer")),
                   
-                      p(div(img(src='Plainspipelinespill.jpg'), a(br(em("Source: NPR")), href = "https://www.npr.org/sections/thetwo-way/2016/05/17/478388898/pipeline-company-indicted-over-2015-california-oil-spill")), h1("Background"), br("Despite advances in renewable energy, the United States transportation sector predominantly runs on refined crude oil (e.g. gasoline). Since refinement and consumption do not occur at crude oil's extraction point, vast quantities must be transported around the country and world. Within the U.S, oil pipelines are the primary and most efficient transportation method (Forbes). However, as our data show, pipeline continally fail, making accidents disturbingly common and costly occurance. With only the most catastrophic accidents gaining media coverage, the overall frequency and magnitude of oil accidents within the U.S. can be difficult to fathom. This app is designed to help users explore the geographic spread, cost, fuel type, and companies responsible for U.S oil pipeline accidents (Jan 2010-Jan 2017). 
+                      p(div(img(src='Plainspipelinespill.jpg'), a(br(em("Source: NPR")), href = "https://www.npr.org/sections/thetwo-way/2016/05/17/478388898/pipeline-company-indicted-over-2015-california-oil-spill")), h1("Background"), br("Despite advances in renewable energy, the United States transportation sector is predominantly run on refined crude oil (e.g. gasoline). Since refinement and consumption do not occur at crude oil's extraction point, vast quantities must be transported around the country and world. Within the U.S, oil pipelines are the primary and most efficient transportation method (Forbes). However, as our data show, pipelines continally fail, making accidents a disturbingly common and costly occurance. With only the most catastrophic accidents gaining media coverage, the overall frequency and magnitude of oil accidents within the U.S. can be difficult to fathom. This app is designed to help users explore the geographic spread, cost, fuel type, and companies responsible for U.S oil pipeline accidents (2010-2016). 
 
                                                                                  ") ), 
                       p("A dataset created by the U.S Department of Transportation consisting of oil pipeline accidents in the U.S from January 2010 to January 2017 was used.
