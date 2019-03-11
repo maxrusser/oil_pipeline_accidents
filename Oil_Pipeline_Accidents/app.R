@@ -87,17 +87,17 @@ ui <- fluidPage(
              tabPanel("Summary",
                       p(strong("Gage Clawson, Nelson Gould, Max Russer")),
                   
-                      p(div(img(src='Plainspipelinespill.jpg'), a(br(em("Source: NPR")), href = "https://www.npr.org/sections/thetwo-way/2016/05/17/478388898/pipeline-company-indicted-over-2015-california-oil-spill")), h1("Background"), br("Despite advances in renewable energy, the United States transportation sector is predominantly run on crude oil and the petroleum products the oil is used to make (i.e gasoline). Because oil is not refined and consumed in the same location that it is extracted, transportation of vast amounts of oil around the country is necessary. In the U.S, the primary mode of oil transportation is via pipelines (Forbes). Oil pipeline spills are disturbingly common in the U. S. The extent of their impact can be difficult to fully fathom. This app is designed to help users explore the geographic spread, cost, and liquid types involved in U.S oil pipeline accidents. 
+                      p(div(img(src='Plainspipelinespill.jpg'), a(br(em("Source: NPR")), href = "https://www.npr.org/sections/thetwo-way/2016/05/17/478388898/pipeline-company-indicted-over-2015-california-oil-spill")), h1("Background"), br("Despite advances in renewable energy, the United States transportation sector predominantly runs on refined crude oil (e.g. gasoline). Since refinement and consumption do not occur at crude oil's extraction point, vast quantities must be transported around the country and world. Within the U.S, oil pipelines are the primary and most efficient transportation method (Forbes). However, as our data show, pipeline continally fail, making accidents disturbingly common and costly occurance. With only the most catastrophic accidents gaining media coverage, the overall frequency and magnitude of oil accidents within the U.S. can be difficult to fathom. This app is designed to help users explore the geographic spread, cost, fuel type, and companies responsible for U.S oil pipeline accidents (Jan 2010-Jan 2017). 
 
                                                                                  ") ), 
                       p("A dataset created by the U.S Department of Transportation consisting of oil pipeline accidents in the U.S from January 2010 to January 2017 was used.
 Data Source: https://www.kaggle.com/usdot"),
                       h3("Map of Accidents and Costs"),
-                      p("The second tab of our app, 'Map of Accidents and Costs', shows the location of different oil accidents across the United States. It also shows the cost of each accident, represented by the size of the dot. The drop down menu allows the user to select the type of pipeline the accident occurred on. Upon clicking on an individual dot, information on the City, Total Cost, Location (Onshore or Offshore), and Date of accident appears. Within the map, the user has the choice of selecting the basemap to view, one with a light theme, and one with a dark theme."), 
+                      p("The second tab of our app, 'Map of Accidents and Costs', shows the location of different oil accidents across the United States, along with the cost of each accident, represented by the size of the dot. The drop down menu allows the user to select the type of pipeline the accident occurred on. Upon clicking on an individual accident's dot, information on the City, Total Cost, Location (Onshore or Offshore), and Date of accident appears. Within the map, the user has the choice of selecting the basemap to view, one with a light theme, and one with a dark theme."), 
                       h3("Top Spills by State"),
-                      p("asdfasdfas"),
+                      p("The third tab, 'Top Spills by State', graphs the top ten costliest spills in each state. Through  drop-down and button selection, users can cycle between states, as well as select whether to color-separate each spill by county or by company responsible."),
                       h3("Liquid Type by State"),
-                      p("The third tab, 'Liquid Type by State', indicates the percent amount of a liquid type spilled by state. Users can choose a state from the drop down menu. Once a state is chosen, an interactive donut graph is generated indicating the percent amount of liquid types for all oil pipeline accidents in that particular state. Liquid types include crude oil, flammable or toxic fluid/gas, refined liquid petrolum product, carbon dioxide, and biofuel.")
+                      p("The fourth tab, 'Liquid Type by State', indicates the percent amount of a individual liquid types spilled within a given state. Users can select the state by drop-down menu. Once a state is chosen, an interactive donut graph displays the percent amount of liquid types for all oil pipeline accidents in that state. Liquid types include crude oil, flammable or toxic fluid/gas, refined liquid petrolum product, carbon dioxide, and biofuel.")
                       
              ),
              
@@ -171,7 +171,7 @@ server <- function(input, output) {
     # Creating map
     cost_map <- 
       tm_shape(costs_inc) +
-      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs", "Location: " = "pipeline_location", "Date:" = "date"), title.col = "Total Cost of Accident (USD)") +
+      tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs", "Location: " = "pipeline_location", "Net Loss (Barrels): " = "net_loss_barrels", "Date:" = "date"), title.col = "Total Cost of Accident (USD)") +
       #tm_view(view.legend.position = c("left", "center")) +
       tm_basemap(c("Esri.OceanBasemap", "CartoDB.DarkMatter"))
     
