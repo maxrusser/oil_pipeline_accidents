@@ -51,7 +51,15 @@ oil_accidents <- oil_accidents_raw %>%
 #change date to date standard international date format. Chagne NA pipeline types to "Not Specified". Change those "Not Specified" without city names to "Gulf of Mexico" for city name. If there is a county name but not a city name, assign the city name as county name. 
 
 oil_accidents_US <- oil_accidents %>%
-  filter(accident_longitude < -60)
+  filter(accident_longitude < -60) %>%
+  mutate(liquid_type = case_when(
+    liquid_type == "HVL OR OTHER FLAMMABLE OR TOXIC FLUID, GAS" ~ "Flammable or toxic fluid/gas", 
+    liquid_type == "REFINED AND/OR PETROLEUM PRODUCT (NON-HVL), LIQUID" ~ "Refined Liquid Petroleum Product",
+    liquid_type == "CRUDE OIL" ~ "Crude Oil", 
+    liquid_type == "CO2 (CARBON DIOXIDE)" ~ "CO2 (Carbon Dioxide)",
+    liquid_type == "BIOFUEL / ALTERNATIVE FUEL(INCLUDING ETHANOL BLENDS)" ~ "Biofuel",
+    liquid_type == liquid_type ~ liquid_type
+  ))
 
 write.csv(oil_accidents_US, "cleaned_oil_data.csv")
 
@@ -78,56 +86,43 @@ ui <- fluidPage(
              
              tabPanel("Summary",
                       p(strong("Gage Clawson, Nelson Gould, Max Russer")),
-                      h1("A header"),
-                    
-                      p(div(img(src='PlatformHolly.jpg'), br(em("Source:"))), br("Despite advances in renewable energy, the United States transportation sector is predominantly run on crude oil and the petroleum products the oil is used to make (i.e gasoline). Because oil is not refined and consumed in the same location that it is extracted, transportation of vast amounts of oil around the country is necessary. In the U.S, the primary mode of oil transportation is via pipelines (Forbes). Oil pipeline spills are disturbingly common in the U. S. The extent of their impact can be difficult to fully fathom. This app is designed to help users explore the geographic spread, cost, and liquid types involved in U.S oil pipeline accidents. 
+                  
+                      p(div(img(src='Plainspipelinespill.jpg'), a(br(em("Source: NPR")), href = "https://www.npr.org/sections/thetwo-way/2016/05/17/478388898/pipeline-company-indicted-over-2015-california-oil-spill")), h1("Background"), br("Despite advances in renewable energy, the United States transportation sector is predominantly run on crude oil and the petroleum products the oil is used to make (i.e gasoline). Because oil is not refined and consumed in the same location that it is extracted, transportation of vast amounts of oil around the country is necessary. In the U.S, the primary mode of oil transportation is via pipelines (Forbes). Oil pipeline spills are disturbingly common in the U. S. The extent of their impact can be difficult to fully fathom. This app is designed to help users explore the geographic spread, cost, and liquid types involved in U.S oil pipeline accidents. 
 
                                                                                  ") ), 
                       p("A dataset created by the U.S Department of Transportation consisting of oil pipeline accidents in the U.S from January 2010 to January 2017 was used.
 Data Source: https://www.kaggle.com/usdot"),
-                      h1("Then another header"),
-                      p("You get the idea...)")
+                      h3("Map of Accidents and Costs"),
+                      p("The second tab of our app, 'Map of Accidents and Costs', shows the location of different oil accidents across the United States. It also shows the cost of each accident, represented by the size of the dot. The drop down menu allows the user to select the type of pipeline the accident occurred on. Upon clicking on an individual dot, information on the City, Total Cost, Location (Onshore or Offshore), and Date of accident appears. Within the map, the user has the choice of selecting the basemap to view, one with a light theme, and one with a dark theme."), 
+                      h3("Top Spills by State"),
+                      p("asdfasdfas"),
+                      h3("Liquid Type by State"),
+                      p("The third tab, 'Liquid Type by State', indicates the percent amount of a liquid type spilled by state. Users can choose a state from the drop down menu. Once a state is chosen, an interactive donut graph is generated indicating the percent amount of liquid types for all oil pipeline accidents in that particular state. Liquid types include crude oil, flammable or toxic fluid/gas, refined liquid petrolum product, carbon dioxide, and biofuel.")
                       
              ),
              
-             # Sidebar with a slider input for number of bins 
-             tabPanel("Accident Map",
+             tabPanel("Map of Accidents and Costs",
                       sidebarLayout(
                         sidebarPanel(
-                          #sliderInput("all_costs",
-                          #           "Cost of Spill (USD):",
-                          #           min = 0,
-                          #         max = 840526118,
-                          #        value = 0),
                           selectInput("pipelinet",
                                       "Select Pipeline Type", 
-                                      choices = c("Aboveground" ="ABOVEGROUND", "Underground"= "UNDERGROUND", "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") ##filter out NA pipeline types? 
+                                      choices = c("Underground"= "UNDERGROUND", "Aboveground" ="ABOVEGROUND",  "Tank"="TANK", "Transition Area"="TRANSITION AREA", "Not Specified in Data" = "Not Specified") 
                           ), width =3
-                          #sliderInput("net_loss_barrels", 
-                          #            "Number of Barrels Lost",
-                          #           min = 0,
-                          #         max = 31000,
-                          #         value = 0)   
-                          
-                          
                         ),
                         
-                        
-                        
-                        # Show a plot of the generated distribution
                         mainPanel(
                           leafletOutput("map")
                         )
                       )
              ), 
-             tabPanel("Top Spills",
+             tabPanel("Top Spills by State",
                       sidebarLayout(
                         sidebarPanel(
                           selectInput("acc_state_graph1",
                                       "Select State", 
                                       choices = c(sort(oil_accidents_US$accident_state)),
                                       selected = 1
-                          ),
+                          ), width = 3,
           
                         radioButtons("graph1_filltype", label = "Divide by County or Operator Responsible",
                                      choices = county_or_company
@@ -152,7 +147,7 @@ Data Source: https://www.kaggle.com/usdot"),
                           ), width = 2
                         ),
                         mainPanel(
-                          plotOutput("graph2")
+                          plotlyOutput("graph2")
                         )
                       )
              )
@@ -169,22 +164,19 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     
     costs_inc <- oil_geom1 %>% 
-      filter(#all_costs >= input$all_costs, 
+      filter(
              pipeline_type == input$pipelinet)
-             #net_loss_barrels >= input$net_loss_barrels) 
+            
     
     # Creating map
     cost_map <- 
       tm_shape(costs_inc) +
       tm_bubbles(size = "all_costs", alpha = 0.5,  col = "all_costs",  popup.vars = c("City: " = "accident_city", "Total Cost (USD): " = "all_costs", "Location: " = "pipeline_location", "Date:" = "date"), title.col = "Total Cost of Accident (USD)") +
-      tm_view(view.legend.position = c("left", "bottom")) +
+      #tm_view(view.legend.position = c("left", "center")) +
       tm_basemap(c("Esri.OceanBasemap", "CartoDB.DarkMatter"))
     
     #all basemaps:
     #http://leaflet-extras.github.io/leaflet-providers/preview/index.html
-   #Esri.OceanBasemap
-    #CartoDB.DarkMatter
-  #Esri.NatGeoWorldMap
     
     # Leaflet 
     tmap_leaflet(cost_map)
@@ -228,7 +220,7 @@ server <- function(input, output) {
   
   #Graph 2: Liquid type by State
   
-  output$graph2 <- renderPlot({
+  output$graph2 <- renderPlotly({
     
     liquid_types <- oil_accidents_US %>%
       filter(accident_state == input$acc_state_graph2) %>%
@@ -240,29 +232,31 @@ server <- function(input, output) {
     liquid_types$ymax = cumsum(liquid_types$fraction)
     liquid_types$ymin = c(0, head(liquid_types$ymax, n=-1))
     
-    ggplot(liquid_types, aes(fill=liquid_type, ymax=ymax, ymin=ymin, xmax=4, xmin=3)) +
-      geom_rect(colour = "grey30") +
-      coord_polar(theta="y") +
-      xlim(c(0, 4)) +
-      theme(panel.grid=element_blank()) +
-      theme(axis.text=element_blank()) +
-      theme(axis.ticks=element_blank()) +
-      annotate("text", x = 0, y = 0, label = NA) +
-      labs(title="") +
-      guides(fill=guide_legend(title="Liquid Type")) +
-      theme_void()+ 
-    theme(legend.position = "bottom", legend.direction = "vertical")
+    
+    ##non plotly version##
+   # ggplot(liquid_types, aes(fill=liquid_type, ymax=ymax, ymin=ymin, xmax=4, xmin=3)) +
+  #    geom_rect(colour = "grey30") +
+   #   coord_polar(theta="y") +
+    #  xlim(c(0, 4)) +
+     # theme(panel.grid=element_blank()) +
+      #theme(axis.text=element_blank()) +
+      #theme(axis.ticks=element_blank()) +
+      #annotate("text", x = 0, y = 0, label = NA) +
+      #labs(title="") +
+      #guides(fill=guide_legend(title="Liquid Type")) +
+      #theme_void()+ 
+    #theme(legend.position = "bottom", legend.direction = "vertical")
     
     
-    ####comment out above and run lines below for interactive plotly output. For plotly output also need to add "renderPlotly" and "plotlyOutput" up above for graph2. ####
+##Plotly version##
     
-    #plot_ly(liquid_types, labels = ~liquid_type, values = ~fraction, fill = ~liquid_type) %>%
-     # add_pie(hole = 0.75) %>% 
-      #layout(showlegend = T,
-       #     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+    plot_ly(liquid_types, labels = ~liquid_type, values = ~fraction, fill = ~liquid_type) %>%
+      add_pie(hole = 0.75) %>% 
+      layout(showlegend = T,
+            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
         
-    #    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-     #       legend = list(orientation = "h", x = 0.4, y = -0.2))
+        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+            legend = list(orientation = "h", x = 0.4, y = -0.2))
     
     
   })

@@ -70,7 +70,16 @@ oil_accidents <- oil_accidents_raw %>%
 # these are obvious incidents of inputting data incorrectly. Lets filter to lat and long ranges for the united states. I think all of the latitudes look fine 
 
 oil_accidents_US <- oil_accidents %>%
-  filter(accident_longitude < -60)
+  filter(accident_longitude < -60) %>%
+   filter(accident_longitude < -60) %>%
+  mutate(liquid_type = case_when(
+    liquid_type == "HVL OR OTHER FLAMMABLE OR TOXIC FLUID, GAS" ~ "Flammable or toxic fluid/gas", 
+    liquid_type == "REFINED AND/OR PETROLEUM PRODUCT (NON-HVL), LIQUID" ~ "Refined Liquid Petroleum Product",
+    liquid_type == "CRUDE OIL" ~ "Crude Oil", 
+    liquid_type == "CO2 (CARBON DIOXIDE)" ~ "CO2 (Carbon Dioxide)",
+    liquid_type == "BIOFUEL / ALTERNATIVE FUEL(INCLUDING ETHANOL BLENDS)" ~ "Biofuel",
+    liquid_type == liquid_type ~ liquid_type
+  ))
 
 write.csv(oil_accidents_US, "cleaned_oil_data")
 ```
