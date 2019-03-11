@@ -191,9 +191,6 @@ server <- function(input, output) {
 })
   
   #Creating Graph 1: Top Costliest Spills by State and County
-    
-  
-  
   
   output$graph1 <- renderPlot({
 
